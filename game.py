@@ -28,10 +28,11 @@ class Game:
     def handle_jumps(self, increment, collide, move_func):
         if increment > 0:
             print(self.jump)
-            move_func(collide, 0, -24)
+            move_func.move(collide, 0, -24)
             return increment - 1
         else:
             self.jump = 'TRACKED'
+            move_func.grounded = False
             print(self.jump)
     # Runs the level itself and returns a status message, statuses are PLAYING, WON, LOST, and QUIT
 
@@ -58,10 +59,12 @@ class Game:
                 self.handle_input(keys_down, lvl.player.move, lvl.objects)
             # lvl.update_offset(lvl.player)
             if self.jump == 'JUMPING':
-                a_jump = self.handle_jumps(a_jump, lvl.objects, lvl.player.move)
+                a_jump = self.handle_jumps(a_jump, lvl.objects, lvl.player)
             elif self.jump == 'TRACKED':
-                if lvl.player.grounded is False:
-                    pass
+                lvl.player.update()
+                if lvl.player.grounded is True:
+                    self.jump = 'ALLOWED'
+                    a_jump = 6
             objects.draw(self.display.screen)
             pygame.display.update()
             self.display.screen.fill([255, 255, 255])

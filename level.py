@@ -35,7 +35,7 @@ class Level:
 
     def update_offset(self, player):
         initial_offset = self.offset_x
-        self.offset_x += -6
+        self.offset_x += 6
         self.objects.update()
         if player.rect.x - initial_offset > 450:
             print('time')
