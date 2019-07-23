@@ -21,9 +21,9 @@ class Game:
                 # move_func(collide, 0, -16)
                 self.jump = 'JUMPING'
         if self.keys[2] in keys and self.keys[3] not in keys:
-            move_func(collide, -3)
+            move_func(collide, -4)
         if self.keys[3] in keys and self.keys[2] not in keys:
-            move_func(collide, 3)
+            move_func(collide, 4)
 
     def handle_jumps(self, increment, collide, move_func):
         if increment > 0:
@@ -58,10 +58,10 @@ class Game:
             if len(keys_down) > 0:
                 self.handle_input(keys_down, lvl.player.move, lvl.objects)
             # lvl.update_offset(lvl.player)
+            lvl.player.update()
             if self.jump == 'JUMPING':
                 a_jump = self.handle_jumps(a_jump, lvl.objects, lvl.player)
             elif self.jump == 'TRACKED':
-                lvl.player.update()
                 if lvl.player.grounded is True:
                     self.jump = 'ALLOWED'
                     a_jump = 6

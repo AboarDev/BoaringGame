@@ -11,7 +11,7 @@ class Display:
         self.screen.fill(self.color)
         # py game.draw.rect(self.screen, [000, 000, 000], [20, 20, 20, 20], 1)
         pygame.display.flip()
-        pygame.display.set_caption('Test')
+        pygame.display.set_caption('BoaringGame')
 
 
 if __name__ == '__main__':

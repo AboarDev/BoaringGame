@@ -90,25 +90,30 @@ class Player(pygame.sprite.Sprite):
         self.grounded = True
         self.level = ''
 
-    def collide_x(self, x, rect, level_objects):
-        if x > 1:
-            i = -2
-        else:
-            i = 1
+    def collide_x(self, x, rect, level_objects, depth=0, i=None):
+        if not i:
+            if x > 0:
+                i = -1
+            elif x < 0:
+                i = 1
+            else:
+                i = 0
         if pygame.sprite.spritecollide(self, level_objects, False):
-            print(i)
             x = x + i
             self.rect = rect
             self.rect = self.rect.move([x, 0])
-            self.collide_x(x, rect, level_objects)
+            if depth < 6:
+                self.collide_x(x, rect, level_objects, depth+1, i)
+            else:
+                print(rect, self.rect, x, i)
 
     def collide_y(self, y, rect, level_objects):
-        if y == 1:
+        if y == 0:
             self.grounded = True
-            self.rect = self.rect.move([0,-1])
+            self.rect = self.rect.move([0,0])
             return
         if y > 1:
-            i = -1
+            i = -2
         else:
             i = 1
         if pygame.sprite.spritecollide(self, level_objects, False):
@@ -120,9 +125,16 @@ class Player(pygame.sprite.Sprite):
     def move(self, level_objects, x=0, y=0):
         self.level = level_objects
         self.offset_x = self.get_offset()
+        # print(self.offset_x)
         # if self.rect.x >= 450 + self.offset_x * 1 and x > 0:
-        if self.rect.x >= 445 and x > 0:
+        if self.rect.x >= 450 and x > 0:
             # print(self.rect.x, self.offset_x, (self.offset_x * -1) + 450)
+            base_rect = self.rect
+            self.rect = self.rect.move([x, 0])
+            if not pygame.sprite.spritecollide(self, level_objects, False):
+                self.set_offset(self.offset_x + (x))
+            self.rect = base_rect
+        elif self.rect.x <= 150 and x < 0 and self.offset_x > 0:
             base_rect = self.rect
             self.rect = self.rect.move([x, 0])
             if not pygame.sprite.spritecollide(self, level_objects, False):
@@ -131,16 +143,19 @@ class Player(pygame.sprite.Sprite):
         else:
             base_rect = self.rect
             self.rect = self.rect.move([x, y])
-            if x is not 0:
+            if x is not 0 and self.grounded is True:
                 self.collide_x(x, base_rect, level_objects)
-            if y is not 0:
-                self.collide_y(y,base_rect,level_objects)
+            # if y is not 0:
+                # self.collide_y(y,base_rect,level_objects)
 
     def update(self, *args):
         base_rect = self.rect
-        if self.grounded is False:
-            self.rect = self.rect.move([0,5])
-            self.collide_y(5, base_rect, self.level)
+        if self.grounded is True:
+            self.image.fill(pygame.Color("""#00FF00"""))
+        elif self.grounded is False:
+            self.image.fill(pygame.Color("""#00FFFF"""))
+            self.rect = self.rect.move([0,6])
+            self.collide_y(6, base_rect, self.level)
 
 
 class Mob(GameObject):
