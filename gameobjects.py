@@ -92,10 +92,11 @@ class Player(pygame.sprite.Sprite):
 
     def collide_x(self, x, rect, level_objects):
         if x > 1:
-            i = -1
+            i = -2
         else:
             i = 1
         if pygame.sprite.spritecollide(self, level_objects, False):
+            print(i)
             x = x + i
             self.rect = rect
             self.rect = self.rect.move([x, 0])
@@ -130,13 +131,16 @@ class Player(pygame.sprite.Sprite):
         else:
             base_rect = self.rect
             self.rect = self.rect.move([x, y])
-            self.collide_x(x, base_rect, level_objects)
+            if x is not 0:
+                self.collide_x(x, base_rect, level_objects)
+            if y is not 0:
+                self.collide_y(y,base_rect,level_objects)
 
     def update(self, *args):
         base_rect = self.rect
         if self.grounded is False:
-            self.rect = self.rect.move([0,10])
-            self.collide_y(10, base_rect, self.level)
+            self.rect = self.rect.move([0,5])
+            self.collide_y(5, base_rect, self.level)
 
 
 class Mob(GameObject):

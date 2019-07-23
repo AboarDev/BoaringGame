@@ -21,9 +21,9 @@ class Game:
                 # move_func(collide, 0, -16)
                 self.jump = 'JUMPING'
         if self.keys[2] in keys and self.keys[3] not in keys:
-            move_func(collide, -6)
+            move_func(collide, -3)
         if self.keys[3] in keys and self.keys[2] not in keys:
-            move_func(collide, 6)
+            move_func(collide, 3)
 
     def handle_jumps(self, increment, collide, move_func):
         if increment > 0:
@@ -68,7 +68,7 @@ class Game:
             objects.draw(self.display.screen)
             pygame.display.update()
             self.display.screen.fill([255, 255, 255])
-            py_time.sleep(0.032)
+            py_time.sleep(0.016)
 
         if status == 'QUIT':
             sys.exit()
