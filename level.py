@@ -57,6 +57,8 @@ class Level:
                         self.player.set_offset = self.set_offset
                     else:
                         self.objects.add(a_object)
+                    if a_object.has_collide is True:
+                        pass
                 lvl_clm += 1
 
             lvl_rw += 1

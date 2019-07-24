@@ -26,6 +26,7 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.is_player = False
+        self.has_collide = False
         self.offset_y = 0
         self.offset_x = 0
         self.get_offset = get_offset
@@ -45,6 +46,7 @@ class Coin(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.is_player = False
+        self.has_collide = True
         self.offset_y = 0
         self.offset_x = 0
         self.get_offset = get_offset
@@ -64,6 +66,7 @@ class Lava(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.is_player = False
+        self.has_collide = True
         self.offset_y = 0
         self.offset_x = 0
         self.get_offset = get_offset
@@ -83,12 +86,13 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.is_player = True
+        self.has_collide = False
         self.offset_y = 0
         self.offset_x = 0
         self.get_offset = get_offset
         self.set_offset = ''
         self.grounded = True
-        self.level = ''
+        self.level = None
 
     def collide_x(self, x, rect, level_objects, depth=0, i=None):
         if not i:
@@ -100,12 +104,12 @@ class Player(pygame.sprite.Sprite):
                 i = 0
         if pygame.sprite.spritecollide(self, level_objects, False):
             x = x + i
-            self.rect = rect
-            self.rect = self.rect.move([x, 0])
-            if depth < 6:
+            self.rect = rect.move([x, 0])
+            if depth < 4:
                 self.collide_x(x, rect, level_objects, depth+1, i)
             else:
-                print(rect, self.rect, x, i)
+                print('depth', depth)
+                # self.grounded = False
 
     def collide_y(self, y, rect, level_objects):
         if y == 0:
@@ -118,35 +122,46 @@ class Player(pygame.sprite.Sprite):
             i = 1
         if pygame.sprite.spritecollide(self, level_objects, False):
             y = y + i
-            self.rect = rect
-            self.rect = self.rect.move([0, y])
+            self.rect = rect.move([0, y])
             self.collide_y(y, rect, level_objects)
 
     def move(self, level_objects, x=0, y=0):
-        self.level = level_objects
+        if not self.level:
+            self.level = level_objects
         self.offset_x = self.get_offset()
         # print(self.offset_x)
         # if self.rect.x >= 450 + self.offset_x * 1 and x > 0:
-        if self.rect.x >= 450 and x > 0:
-            # print(self.rect.x, self.offset_x, (self.offset_x * -1) + 450)
+        if x is not 0:
+            if self.rect.x >= 450 and x > 0:
+                # print(self.rect.x, self.offset_x, (self.offset_x * -1) + 450)
+                base_rect = self.rect
+                self.rect = self.rect.move([x, 0])
+                if not pygame.sprite.spritecollide(self, level_objects, False):
+                    self.set_offset(self.offset_x + (x))
+                self.rect = base_rect
+
+            elif self.rect.x <= 150 and x < 0 and self.offset_x > 0:
+                base_rect = self.rect
+                self.rect = self.rect.move([x, 0])
+                if not pygame.sprite.spritecollide(self, level_objects, False):
+                    self.set_offset(self.offset_x + (x))
+                self.rect = base_rect
+
+            else:
+                base_rect = self.rect
+                self.rect = self.rect.move([x, y])
+                self.collide_x(x,base_rect,level_objects)
+
             base_rect = self.rect
-            self.rect = self.rect.move([x, 0])
-            if not pygame.sprite.spritecollide(self, level_objects, False):
-                self.set_offset(self.offset_x + (x))
+            self.rect = self.rect.move([0,6])
+            self.collide_y(6,base_rect,level_objects)
+            if self.rect != base_rect:
+                self.grounded = False
             self.rect = base_rect
-        elif self.rect.x <= 150 and x < 0 and self.offset_x > 0:
-            base_rect = self.rect
-            self.rect = self.rect.move([x, 0])
-            if not pygame.sprite.spritecollide(self, level_objects, False):
-                self.set_offset(self.offset_x + (x))
-            self.rect = base_rect
-        else:
+        elif y is not 0:
             base_rect = self.rect
             self.rect = self.rect.move([x, y])
-            if x is not 0 and self.grounded is True:
-                self.collide_x(x, base_rect, level_objects)
-            # if y is not 0:
-                # self.collide_y(y,base_rect,level_objects)
+            self.collide_y(y,base_rect,level_objects)
 
     def update(self, *args):
         base_rect = self.rect
